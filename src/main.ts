@@ -28,7 +28,23 @@ async function bootstrap() {
     transform: true,
   }));
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  await app.init();
+  return app;
 }
-bootstrap();
+
+// For Vercel serverless
+let app: any;
+export default async (req: any, res: any) => {
+  if (!app) {
+    app = await bootstrap();
+  }
+  return app.getHttpAdapter().getInstance()(req, res);
+};
+
+// For local development
+if (require.main === module) {
+  bootstrap().then(app => {
+    app.listen(process.env.PORT ?? 3000);
+    console.log(`Application is running on port ${process.env.PORT ?? 3000}`);
+  });
+}
