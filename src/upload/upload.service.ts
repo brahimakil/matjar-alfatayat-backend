@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UploadService {
@@ -8,7 +8,7 @@ export class UploadService {
 
   async uploadFile(file: Express.Multer.File, folder: string = 'uploads'): Promise<string> {
     const bucket = this.storage.bucket();
-    const fileName = `${folder}/${uuidv4()}-${file.originalname}`;
+    const fileName = `${folder}/${randomUUID()}-${file.originalname}`;
     const fileUpload = bucket.file(fileName);
 
     await fileUpload.save(file.buffer, {
